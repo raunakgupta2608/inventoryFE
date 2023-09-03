@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Box, Toolbar, TextField } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import AppButton from "./AppButton";
-import { fetchUsers, filterUsers } from "../redux/actions";
-import { useDispatch } from "react-redux";
+import globalContext from "../context/globalContext";
+import API from "../utils/axios";
 
 const useStyle = makeStyles({
   toolbar: {
@@ -16,17 +16,25 @@ const useStyle = makeStyles({
 
 function AppSearch() {
   const classes = useStyle();
-  const dispatch = useDispatch();
   const [searchValue, setSearchValue] = useState("");
+  const { globalData, setGlobalData } = useContext(globalContext);
 
   const handleChange = ({ target }) => {
     setSearchValue(target.value);
   };
 
+  async function getUsers() {
+    try {
+      const resp = await API.get("/users");
+      if (resp.status === 200) setGlobalData(resp.data);
+    } catch (error) {}
+  }
+
   const handleClick = () => {
     if (searchValue !== "") {
-      dispatch(filterUsers(searchValue));
-    } else dispatch(fetchUsers());
+      const res = globalData.filter((ele) => ele.name.includes(searchValue));
+      if (res.length > 0) setGlobalData(res);
+    } else getUsers();
   };
 
   return (

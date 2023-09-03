@@ -2,10 +2,10 @@ import React, { useContext, useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { makeStyles } from "@mui/styles";
-import AppButton from "./AppButton";
-import Loader from "./Loader";
-import globalContext from "../context/globalContext";
+import AppButton from "../commonControls/AppButton";
+import Loader from "../commonControls/Loader";
 import API from "../utils/axios";
+import globalContext from "../context/globalContext";
 
 const useStyles = makeStyles({
   form: {
@@ -25,7 +25,7 @@ const useStyles = makeStyles({
   },
 });
 
-function AppForm({ add }) {
+function AddNewUser() {
   const classes = useStyles();
   const [formState, setFormState] = useState({
     name: "",
@@ -36,21 +36,29 @@ function AppForm({ add }) {
   });
   const [open, setOpen] = useState(false);
   const [dataUploaded, setDataUploaded] = useState(false);
+  const { setGlobalData } = useContext(globalContext);
 
-  const { setGlobalData, selectedUser } = useContext(globalContext);
-
-  useEffect(() => {
-    const { name, email, dob, address, photo, _id } = selectedUser;
-    setFormState({
-      ...formState,
-      id: _id,
-      name,
-      email,
-      dob,
-      address,
-      photo,
-    });
-  }, [selectedUser]);
+  const handleAddUser = async () => {
+    if (dataUploaded) {
+      try {
+        setOpen(true);
+        const resp = await API.post("/users", formState);
+        if (resp.status === 201) {
+          setFormState({
+            name: "",
+            email: "",
+            dob: "",
+            address: "",
+            photo: "",
+          });
+          await getUsers();
+        }
+        setOpen(false);
+      } catch (error) {
+        console.log("error", error);
+      }
+    }
+  };
 
   async function getUsers() {
     setOpen(true);
@@ -61,32 +69,6 @@ function AppForm({ add }) {
       setOpen(false);
     } catch (error) {}
   }
-
-  const handleApi = async (type) => {
-    setOpen(true);
-    if (dataUploaded) {
-      let resp;
-      try {
-        resp =
-          type === "edit"
-            ? await API.put(`/users/${formState.id}`, formState)
-            : await API.delete(`/users/${formState.id}`, formState);
-        if (resp.status === 200) {
-          await getUsers();
-          setFormState({
-            name: "",
-            email: "",
-            dob: "",
-            address: "",
-            photo: "",
-          });
-        }
-        setOpen(false);
-      } catch (error) {
-        console.log("error", error);
-      }
-    }
-  };
 
   function convertToBase64(file) {
     return new Promise((resolve, reject) => {
@@ -175,18 +157,8 @@ function AppForm({ add }) {
           />
         </Box>
         <Box component="div" className={classes.divContainer}>
-          <AppButton
-            onClick={() => handleApi("edit")}
-            style={{ margin: "0 10px" }}
-          >
-            Edit
-          </AppButton>
-
-          <AppButton
-            onClick={() => handleApi("delete")}
-            style={{ margin: "0 10px" }}
-          >
-            Delete
+          <AppButton onClick={handleAddUser} style={{ margin: "0 10px" }}>
+            Add
           </AppButton>
         </Box>
       </Box>
@@ -194,4 +166,4 @@ function AppForm({ add }) {
   );
 }
 
-export default AppForm;
+export default AddNewUser;

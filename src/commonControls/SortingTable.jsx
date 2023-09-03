@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import PropTypes from "prop-types";
 import {
   Avatar,
@@ -16,9 +16,8 @@ import {
 import Loader from "./Loader";
 import { visuallyHidden } from "@mui/utils";
 import { makeStyles } from "@mui/styles";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchUsers } from "../redux/actions";
-import { setSelectedUser } from "../redux/userSelected/selectedUserActions";
+import API from "../utils/axios";
+import globalContext from "../context/globalContext";
 
 const useStyle = makeStyles({
   tableHead: {
@@ -97,7 +96,7 @@ function stableSort(array, comparator) {
 const headCells = [
   {
     id: "avatar",
-    numeric: true,
+    numeric: false,
     label: "Avatar",
   },
   {
@@ -107,13 +106,18 @@ const headCells = [
   },
   {
     id: "email",
-    numeric: true,
+    numeric: false,
     label: "Email",
   },
   {
-    id: "contact",
+    id: "dob",
     numeric: true,
-    label: "Contact",
+    label: "DOB",
+  },
+  {
+    id: "address",
+    numeric: false,
+    label: "Address",
   },
 ];
 
@@ -169,8 +173,8 @@ function SortingTable() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const classes = useStyle();
-  const dispatch = useDispatch();
-  const { loading: loadingUser, users } = useSelector((state) => state.user);
+  const { globalData, setGlobalData, setSelectedUser } =
+    useContext(globalContext);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -178,13 +182,19 @@ function SortingTable() {
     setOrderBy(property);
   };
 
-  React.useEffect(() => {
-    dispatch(fetchUsers());
-  }, []);
+  async function getUsers() {
+    setOpen(true);
+    try {
+      const resp = await API.get("/users");
+      if (resp.status === 200) setGlobalData(resp.data);
+
+      setOpen(false);
+    } catch (error) {}
+  }
 
   React.useEffect(() => {
-    setOpen(loadingUser);
-  }, [loadingUser]);
+    getUsers();
+  }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -196,12 +206,12 @@ function SortingTable() {
   };
 
   const rowSelected = (value) => {
-    dispatch(setSelectedUser(value));
+    setSelectedUser(value);
   };
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - globalData.length) : 0;
 
   return (
     <>
@@ -216,7 +226,7 @@ function SortingTable() {
                 onRequestSort={handleRequestSort}
               />
               <TableBody>
-                {stableSort(users, getComparator(order, orderBy))
+                {stableSort(globalData, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => {
                     const labelId = `sorting-table${index}`;
@@ -237,14 +247,15 @@ function SortingTable() {
                           {
                             <Avatar
                               alt={row.name}
-                              src={row.avatar}
+                              src={row.photo}
                               style={{ margin: "auto" }}
                             />
                           }
                         </TableCell>
                         <TableCell align="center">{row.name}</TableCell>
                         <TableCell align="center">{row.email}</TableCell>
-                        <TableCell align="center">{row.contact}</TableCell>
+                        <TableCell align="center">{row.dob}</TableCell>
+                        <TableCell align="center">{row.address}</TableCell>
                       </TableRow>
                     );
                   })}
@@ -264,7 +275,7 @@ function SortingTable() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={users.length}
+            count={globalData.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

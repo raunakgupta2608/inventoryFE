@@ -1,1 +1,0 @@
-export const SET_LOGIN_DETAILS = "SET_LOGIN_DETAILS";
