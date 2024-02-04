@@ -2,29 +2,19 @@ import React, { useState } from "react";
 import GlobalContext from "./globalContext";
 
 const GlobalState = (props) => {
-  const [globalData, setGlobalData] = useState([
-    {
-      name: "",
-      email: "",
-      dob: "",
-      address: "",
-      photo: "",
-      id: "",
-    },
-  ]);
-
-  const [selectedUser, setSelectedUser] = useState({
-    name: "",
+  const [userData, setUserData] = useState({
+    firstName: "",
+    lastName: "",
     email: "",
-    dob: "",
-    address: "",
-    photo: "",
-    id: "",
+    role: "",
+    _id: "",
   });
+
+  const [inventoryData, setInventoryData] = useState([]);
 
   return (
     <GlobalContext.Provider
-      value={{ globalData, setGlobalData, selectedUser, setSelectedUser }}
+      value={{ userData, setUserData, inventoryData, setInventoryData }}
     >
       {props.children}
     </GlobalContext.Provider>

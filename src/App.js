@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Home from "./components/Home";
 import GlobalState from "./context/GlobalState";
-import AddNewUser from "./components/AddNewUser";
+import LoginAndRegister from "./components/LoginAndRegister";
 
 function App() {
   return (
@@ -9,7 +9,7 @@ function App() {
       <GlobalState>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/addUser" element={<AddNewUser />} />
+          <Route path="/login" element={<LoginAndRegister />} />
         </Routes>
       </GlobalState>
     </BrowserRouter>
