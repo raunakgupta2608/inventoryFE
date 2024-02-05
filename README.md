@@ -63,8 +63,49 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/a
 
 ### Deployment
 
+
+
 This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+### About Inventory App
+The app is intended to list all the available items in the inventory at any point in time.
+The app involves basic functionalities login and registration. While registering one has to register with either of the roles which is manager or assistant.
+
+Once logged in depending on the role the dashboard will be shown.
+The manager has access to add/edit/delete the items in the inventory, while the assistant can only view them.
+
+### Project Structure
+index.js is the file from where the whole application bootstraps.
+App.js has the entry of all the routes.
+
+App.css and index.css are the CSS files for regular styling.
+
+utils(folder)
+It has the axios.js file where the axios is configured.
+
+context(folder)
+The project involves the use of context API to share data across the application.
+globalContext.js file has the context configured.
+GlobalState.js has all the states that are shared across the application. Ex (Users and inventory details.) 
+
+commonControls (folder)
+It has all the components that can be used across the application like Input field, Radio Button field, Grid and the loader component.
+
+components (folder)
+Application specific components are mentioned in the components folder.
+
+mocks (folder)
+This folder is specific to unit testing, mock servers and handlers for the mock service workers are mentioned here.
+
+__test__ (folder)
+This folder has all the unit test files.
+
+jest.config.js and setupTest.js are a few other files which helps in configuring uni tests.
+
+
+
+
